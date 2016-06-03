@@ -79,7 +79,7 @@ class HtmlMin
             $t->nodeValue = preg_replace("/\s{2,}/", " ", $t->nodeValue);
         }
         $doc->normalizeDocument();
-        $divnodes = $xpath->query('//div|//p|//nav|//footer|//article|//script|//hr|//br');
+        $divnodes = $xpath->query('//div|//p|//nav|//footer|//article|//script|//hr|//br|//ul|//li');
         foreach ($divnodes as $d) {
             $candidates = [];
             if (count($d->childNodes)) {
@@ -92,8 +92,14 @@ class HtmlMin
                 if ($c === null) {
                     continue;
                 }
-                if ($c->nodeType == 3) {
-                    $c->nodeValue = trim($c->nodeValue);
+                if($c->nodeType==3){
+                  $skip = ["a","b","i","span","strong","strike","em", "small", "sub", "sup", "ins", "del", "mark"];
+                  if($c->previousSibling != null && in_array(strtolower($c->previousSibling->nodeName), $skip) == false) {
+                    $c->nodeValue = ltrim($c->nodeValue);
+                  }
+                  if($c->nextSibling != null && in_array(strtolower($c->nextSibling->nodeName), $skip) == false) {
+                    $c->nodeValue = rtrim($c->nodeValue);
+                  }
                 }
             }
         }
